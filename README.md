@@ -5,7 +5,7 @@
 
 ## 🌐 Deployment
 
-[notes-app.web.app](https://notes-app.web.app)
+https://notes-2fa46.web.app
 
 ## 🚀 Стек технологий
 
