@@ -1,17 +1,17 @@
+import { ListNotes } from "@/components/notes/ListNotes";
 import { Sidebar } from "@/components/Sidebar";
+import { toaster } from "@/components/ui/chakra/toaster";
+import { Loader } from "@/components/ui/Loader";
 import { Menu } from "@/components/ui/Menu";
 import { useLogout } from "@/hooks/useLogout";
 import { addEmptyNote, subscribeNotes } from "@/services/notes";
 import { useNotesStore } from "@/store/notes/notesStore";
+import { selectorNotesActions } from "@/store/notes/selectors";
 import { selectorUser } from "@/store/user/selectors";
 import { useUserStore } from "@/store/user/userStore";
 import { Avatar, HStack, IconButton, Text, VStack } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { FaPlusCircle } from "react-icons/fa";
-import { Loader } from "@/components/ui/Loader";
-import { ListNotes } from "@/components/notes/ListNotes";
-import { selectorNotesActions } from "@/store/notes/selectors";
-import { toaster } from "@/components/ui/chakra/toaster";
 
 export const NotesSidebar = () => {
   const [loading, setLoading] = useState(true);
@@ -19,7 +19,7 @@ export const NotesSidebar = () => {
   const user = useUserStore(selectorUser);
   const logout = useLogout();
 
-  const { setNotes } = useNotesStore(selectorNotesActions);
+  const { setNotes, setActiveNote } = useNotesStore(selectorNotesActions);
 
   useEffect(() => {
     if (!user) {
@@ -39,7 +39,8 @@ export const NotesSidebar = () => {
       return;
     }
     try {
-      await addEmptyNote(user.uid);
+      const newNote =  await addEmptyNote(user.uid);
+      setActiveNote(newNote);
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : String(error);
 
