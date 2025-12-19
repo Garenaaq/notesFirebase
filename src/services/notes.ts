@@ -1,3 +1,4 @@
+import type { Note } from "@/types/notes";
 import {
   collection,
   doc,
@@ -7,13 +8,12 @@ import {
   orderBy,
   query,
   runTransaction,
-  serverTimestamp,
   setDoc,
+  Timestamp,
   updateDoc,
   type Unsubscribe,
 } from "firebase/firestore";
 import { db } from "./firebase";
-import type { Note } from "@/types/notes";
 
 // функция, которая при регистрации создаст в бд коллекцию
 export const ensureUserDocument = async (userId: string) => {
@@ -52,14 +52,20 @@ export const addEmptyNote = async (userId: string) => {
 
     const newNoteRef = doc(notesCollection);
 
-    tx.set(newNoteRef, {
+    const newNote = {
       title: "Новая заметка",
       content: "",
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    });
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+    };
 
+    tx.set(newNoteRef, newNote);
     tx.update(userRef, { notesCount: increment(1) });
+
+    return {
+      id: newNoteRef.id,
+      ...newNote,
+    };
   });
 };
 
@@ -68,7 +74,7 @@ export const updateContentNote = async (userId: string, noteId: string, content?
 
   await updateDoc(noteRef, {
     content,
-    updateAt: serverTimestamp(),
+    updateAt: Timestamp.now(),
   });
 };
 
@@ -77,7 +83,7 @@ export const updateTitleNote = async (userId: string, noteId: string, title: str
 
   await updateDoc(noteRef, {
     title,
-    updateAt: serverTimestamp(),
+    updateAt: Timestamp.now(),
   });
 };
 
